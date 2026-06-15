@@ -1132,9 +1132,9 @@
 
             <div class="form-group">
                 <label class="form-label" for="api-proxy-input">CORS Proxy URL</label>
-                <input type="text" class="form-input" id="api-proxy-input" placeholder="http://localhost:8080/?url=" value="http://localhost:8080/?url=">
+                <input type="text" class="form-input" id="api-proxy-input" placeholder="http://localhost:8080/?url=">
                 <p class="form-helper">
-                    Se recomienda usar el proxy CORS local de Node.js (`http://localhost:8080/?url=`) para permitir el reenvío seguro del token.
+                    Se detecta automáticamente el entorno. Usa tu proxy de Vercel (`https://tu-dominio.vercel.app/api/proxy?url=`) o el proxy local (`http://localhost:8080/?url=`).
                 </p>
             </div>
 
@@ -1779,14 +1779,20 @@
             }
 
             const token = deobfuscateToken(obfuscatedToken);
+            
+            // Detectar dinámicamente si estamos corriendo en local (file:// o localhost) o en Vercel
+            const isLocal = window.location.protocol === 'file:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+            const defaultProxy = isLocal ? 'http://localhost:8080/?url=' : `${window.location.origin}/api/proxy?url=`;
+
             let proxy = localStorage.getItem('wc_2026_api_proxy');
             if (proxy === null || proxy === 'https://api.allorigins.win/raw?url=') {
-                proxy = 'http://localhost:8080/?url=';
+                proxy = defaultProxy;
                 localStorage.setItem('wc_2026_api_proxy', proxy);
             }
             
             apiTokenInput.value = token;
             apiProxyInput.value = proxy;
+            apiProxyInput.placeholder = defaultProxy;
 
             updateStatusUI();
         }
