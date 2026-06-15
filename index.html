@@ -2010,6 +2010,55 @@
             }
         }
 
+        // Sincronización automática silenciosa si los datos expiran (más de 1 hora de antigüedad)
+        async function autoSyncIfStale() {
+            const obfuscatedToken = localStorage.getItem('wc_2026_api_token');
+            if (!obfuscatedToken) return; // Si no hay token configurado, no hacer nada
+
+            const token = deobfuscateToken(obfuscatedToken);
+            const proxy = localStorage.getItem('wc_2026_api_proxy') || '';
+            const lastUpdatedStr = localStorage.getItem('wc_2026_api_last_updated');
+            
+            let shouldSync = false;
+            if (!lastUpdatedStr) {
+                shouldSync = true;
+            } else {
+                try {
+                    const lastUpdated = new Date(lastUpdatedStr).getTime();
+                    const now = new Date().getTime();
+                    const oneHour = 60 * 60 * 1000;
+                    if (isNaN(lastUpdated) || (now - lastUpdated > oneHour)) {
+                        shouldSync = true;
+                    }
+                } catch (e) {
+                    shouldSync = true;
+                }
+            }
+
+            if (shouldSync) {
+                console.log("[Auto-Sync] Los datos tienen más de 1 hora de antigüedad. Actualizando en segundo plano...");
+                try {
+                    const apiMatches = await fetchMatchesFromAPI(token, proxy);
+                    const mappedMatches = mapApiResponse(apiMatches);
+                    
+                    if (mappedMatches && mappedMatches.length > 0) {
+                        matches = mappedMatches;
+                        localStorage.setItem('wc_2026_matches', JSON.stringify(matches));
+                        localStorage.setItem('wc_2026_api_last_updated', new Date().toLocaleString());
+                        
+                        updateStatusUI('success');
+                        
+                        // Re-renderizar componentes con los datos nuevos
+                        initMap();
+                        renderCalendar();
+                        console.log("[Auto-Sync] Datos actualizados con éxito de forma automática.");
+                    }
+                } catch (err) {
+                    console.error("[Auto-Sync] Error al sincronizar automáticamente:", err);
+                }
+            }
+        }
+
         // Setup Modal Events
         function initModal() {
             apiTriggerBtn.addEventListener('click', () => {
@@ -2043,6 +2092,7 @@
             renderCalendar();
             initModal();
             loadApiSettings(); // Cargar la configuración guardada de API en el inicio
+            autoSyncIfStale(); // Sincronización automática silenciosa si expira (1 hora)
         });
     </script>
 </body>
