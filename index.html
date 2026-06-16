@@ -2218,7 +2218,15 @@
                     }
                 }
 
-                const venue = m.venue || 'Estadio del Mundial';
+                // Fallback de estadio: si la API no trae el estadio, lo buscamos en los partidos locales predefinidos
+                let venue = m.venue;
+                if (!venue || venue === 'Estadio del Mundial') {
+                    const localMatch = defaultMatches.find(dm => 
+                        (dm.home === homeName && dm.away === awayName) || 
+                        (normalizeTeamName(dm.home) === homeName && normalizeTeamName(dm.away) === awayName)
+                    );
+                    venue = localMatch ? localMatch.venue : 'Estadio del Mundial';
+                }
 
                 return {
                     date: dateStr,
