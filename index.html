@@ -1056,6 +1056,221 @@
             color: var(--text-primary);
             border-color: var(--text-secondary);
         }
+
+        /* ===== LIVE MATCH TICKER ===== */
+        .live-match-banner {
+            margin-bottom: 20px;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .ticker-card {
+            background: linear-gradient(135deg, rgba(26, 31, 53, 0.75) 0%, rgba(16, 20, 38, 0.75) 100%);
+            border: 1px solid rgba(212, 168, 83, 0.2);
+            border-radius: var(--radius-lg);
+            padding: 14px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            box-shadow: var(--shadow-lg), 0 0 15px rgba(212, 168, 83, 0.05);
+            backdrop-filter: blur(12px);
+            transition: all 0.3s ease;
+        }
+        
+        .ticker-card.live-match {
+            border-color: rgba(248, 113, 113, 0.3);
+            box-shadow: var(--shadow-lg), 0 0 15px rgba(248, 113, 113, 0.05);
+        }
+
+        .ticker-status-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .ticker-status-tag {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            padding: 4px 10px;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .ticker-status-tag.live {
+            background: rgba(248, 113, 113, 0.1);
+            color: var(--accent-red);
+            border: 1px solid rgba(248, 113, 113, 0.2);
+        }
+
+        .ticker-status-tag.upcoming {
+            background: rgba(212, 168, 83, 0.1);
+            color: var(--accent-gold);
+            border: 1px solid rgba(212, 168, 83, 0.2);
+        }
+
+        .live-pulse-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--accent-red);
+            border-radius: 50%;
+            display: inline-block;
+            animation: pulse 2s infinite;
+        }
+
+        .ticker-main {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            flex-grow: 1;
+            justify-content: center;
+        }
+
+        .ticker-team {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 140px;
+        }
+
+        .ticker-team.home {
+            justify-content: flex-end;
+            text-align: right;
+        }
+
+        .ticker-team.away {
+            justify-content: flex-start;
+            text-align: left;
+        }
+
+        .ticker-flag {
+            width: 32px;
+            height: 22px;
+            border-radius: 4px;
+            object-fit: cover;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .ticker-team-name {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .ticker-score-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-width: 80px;
+        }
+
+        .ticker-score {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 800;
+            background: var(--gradient-gold);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 2px;
+        }
+        
+        .ticker-card.live-match .ticker-score {
+            background: linear-gradient(135deg, #f87171, #ef4444);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 10px rgba(248, 113, 113, 0.2);
+        }
+
+        .ticker-vs {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border: 1px solid var(--border-color);
+            padding: 2px 8px;
+            border-radius: 4px;
+            background: rgba(255,255,255,0.02);
+        }
+
+        .ticker-meta {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 4px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            min-width: 250px;
+        }
+
+        .ticker-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .ticker-meta-item svg {
+            width: 14px;
+            height: 14px;
+            color: var(--accent-gold);
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+        
+        .ticker-card.live-match .ticker-meta-item svg {
+            color: var(--accent-red);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .ticker-card {
+                flex-direction: column;
+                padding: 16px;
+                text-align: center;
+                gap: 16px;
+            }
+
+            .ticker-main {
+                flex-direction: row;
+                width: 100%;
+                justify-content: space-between;
+                gap: 10px;
+            }
+
+            .ticker-team {
+                min-width: 0;
+                flex: 1;
+            }
+
+            .ticker-team.home {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+
+            .ticker-team.away {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+
+            .ticker-meta {
+                align-items: center;
+                min-width: 0;
+                width: 100%;
+                border-top: 1px solid rgba(255,255,255,0.05);
+                padding-top: 10px;
+            }
+        }
     </style>
 </head>
 
@@ -1095,6 +1310,9 @@
 
     <!-- MAP SECTION -->
     <section class="map-section">
+        <!-- Live Match / Next Match Banner -->
+        <div id="live-match-banner" class="live-match-banner"></div>
+
         <div class="map-container">
             <!-- Zoom Controls -->
             <div class="map-zoom-controls">
@@ -2005,6 +2223,7 @@
                 return {
                     date: dateStr,
                     time: timeStr,
+                    utcDate: m.utcDate, // Guardar la fecha UTC cruda para ordenamiento cronológico preciso
                     group: groupLetter,
                     home: homeName,
                     away: awayName,
@@ -2092,6 +2311,7 @@
                         // Re-render components
                         initMap();
                         renderCalendar();
+                        renderLiveMatchTicker();
                     }, 1200);
                 } else {
                     updateStatusUI('error', 'Token requerido para conectar con API-Football');
@@ -2126,6 +2346,7 @@
                 // Re-render UI
                 initMap();
                 renderCalendar();
+                renderLiveMatchTicker();
             } catch (err) {
                 console.error(err);
                 let msg = err.message || 'Error de conexión';
@@ -2180,10 +2401,106 @@
                         // Re-renderizar componentes con los datos nuevos
                         initMap();
                         renderCalendar();
+                        renderLiveMatchTicker();
                         console.log("[Auto-Sync] Datos actualizados con éxito de forma automática.");
                     }
                 } catch (err) {
                     console.error("[Auto-Sync] Error al sincronizar automáticamente:", err);
+                }
+            }
+        }
+
+        // Render live matches or next upcoming match banner
+        function renderLiveMatchTicker() {
+            const bannerContainer = document.getElementById('live-match-banner');
+            if (!bannerContainer) return;
+
+            const liveMatches = matches.filter(m => m.status === 'live');
+
+            if (liveMatches.length > 0) {
+                // Render all live matches
+                bannerContainer.innerHTML = liveMatches.map(match => `
+                    <div class="ticker-card live-match">
+                        <div class="ticker-status-container">
+                            <span class="ticker-status-tag live">
+                                <span class="live-pulse-dot"></span> EN VIVO
+                            </span>
+                        </div>
+                        <div class="ticker-main">
+                            <div class="ticker-team home">
+                                <span class="ticker-team-name">${match.home}</span>
+                                <img src="${getFlagUrl(match.home)}" class="ticker-flag" alt="${match.home}" />
+                            </div>
+                            <div class="ticker-score-wrap">
+                                <div class="ticker-score">${match.score || '0 - 0'}</div>
+                            </div>
+                            <div class="ticker-team away">
+                                <img src="${getFlagUrl(match.away)}" class="ticker-flag" alt="${match.away}" />
+                                <span class="ticker-team-name">${match.away}</span>
+                            </div>
+                        </div>
+                        <div class="ticker-meta">
+                            <div class="ticker-meta-item">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                                <span>${match.venue}</span>
+                            </div>
+                            <div class="ticker-meta-item">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                                <span>Grupo ${match.group}</span>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+                bannerContainer.style.display = 'block';
+            } else {
+                // If there are no live matches, find the next upcoming match
+                const upcomingMatches = matches.filter(m => m.status === 'upcoming');
+                if (upcomingMatches.length > 0) {
+                    // Sort them chronologically (raw UTC date first, then fallback)
+                    upcomingMatches.sort((a, b) => {
+                        if (a.utcDate && b.utcDate) return new Date(a.utcDate) - new Date(b.utcDate);
+                        if (a.date !== b.date) return a.date.localeCompare(b.date);
+                        if (a.time && b.time) return a.time.localeCompare(b.time);
+                        return 0;
+                    });
+                    const nextMatch = upcomingMatches[0];
+
+                    bannerContainer.innerHTML = `
+                        <div class="ticker-card upcoming-match">
+                            <div class="ticker-status-container">
+                                <span class="ticker-status-tag upcoming">
+                                    📅 PRÓXIMO PARTIDO
+                                </span>
+                            </div>
+                            <div class="ticker-main">
+                                <div class="ticker-team home">
+                                    <span class="ticker-team-name">${nextMatch.home}</span>
+                                    <img src="${getFlagUrl(nextMatch.home)}" class="ticker-flag" alt="${nextMatch.home}" />
+                                </div>
+                                <div class="ticker-score-wrap">
+                                    <div class="ticker-vs">VS</div>
+                                </div>
+                                <div class="ticker-team away">
+                                    <img src="${getFlagUrl(nextMatch.away)}" class="ticker-flag" alt="${nextMatch.away}" />
+                                    <span class="ticker-team-name">${nextMatch.away}</span>
+                                </div>
+                            </div>
+                            <div class="ticker-meta">
+                                <div class="ticker-meta-item">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                    <span>${formatDateLong(nextMatch.date)}${nextMatch.time ? ' a las ' + nextMatch.time : ''}</span>
+                                </div>
+                                <div class="ticker-meta-item">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                                    <span>${nextMatch.venue}</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    bannerContainer.style.display = 'block';
+                } else {
+                    bannerContainer.innerHTML = '';
+                    bannerContainer.style.display = 'none';
                 }
             }
         }
@@ -2219,6 +2536,7 @@
             initMap();
             initFilterBar();
             renderCalendar();
+            renderLiveMatchTicker();
             initModal();
             loadApiSettings(); // Cargar la configuración guardada de API en el inicio
             autoSyncIfStale(); // Sincronización automática silenciosa si expira (1 hora)
