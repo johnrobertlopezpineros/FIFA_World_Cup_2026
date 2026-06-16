@@ -684,6 +684,7 @@
             letter-spacing: 1px;
             padding: 3px 8px;
             border-radius: 4px;
+            white-space: nowrap;
         }
 
         .match-status.played {
@@ -1668,7 +1669,7 @@
                     <div class="tooltip-match-score ${match.score ? '' : 'pending'}">
                         ${match.score || (match.status === 'live' ? '🔴 EN VIVO' : 'Próximo')}
                     </div>
-                    <div class="tooltip-match-date">${formatDate(match.date)}</div>
+                    <div class="tooltip-match-date">${formatDate(match.date)}${match.time ? ' • ' + match.time : ''}</div>
                 </div>
             `;
             });
@@ -1767,8 +1768,12 @@
 
         function renderMatchCard(match) {
             const statusClass = match.status;
-            const statusText = match.status === 'played' ? 'Finalizado' :
+            let statusText = match.status === 'played' ? 'Finalizado' :
                 match.status === 'live' ? '🔴 En Vivo' : 'Próximo';
+
+            if (match.time) {
+                statusText += ` • ${match.time}`;
+            }
 
             return `
             <div class="match-card">
@@ -1946,8 +1951,36 @@
                     groupLetter = getGroupForCountry(homeName) || getGroupForCountry(awayName) || 'A';
                 }
 
-                // Date
-                const dateStr = m.utcDate ? m.utcDate.substring(0, 10) : '2026-06-15';
+                // Date & Time in Bogotá Timezone (America/Bogota, UTC-5)
+                let dateStr = '2026-06-15';
+                let timeStr = null;
+
+                if (m.utcDate) {
+                    try {
+                        const matchDate = new Date(m.utcDate);
+                        
+                        // Formatter for YYYY-MM-DD in Bogotá timezone (using fr-CA to produce YYYY-MM-DD format)
+                        const dateFormatter = new Intl.DateTimeFormat('fr-CA', {
+                            timeZone: 'America/Bogota',
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit'
+                        });
+                        dateStr = dateFormatter.format(matchDate);
+
+                        // Formatter for time (hour/minute) in Bogotá timezone
+                        const timeFormatter = new Intl.DateTimeFormat('es-CO', {
+                            timeZone: 'America/Bogota',
+                            hour: 'numeric',
+                            minute: '2-digit',
+                            hour12: true
+                        });
+                        timeStr = timeFormatter.format(matchDate);
+                    } catch (err) {
+                        console.error('Error parsing date/time for match:', m.utcDate, err);
+                        dateStr = m.utcDate.substring(0, 10);
+                    }
+                }
 
                 // Status: FINISHED, IN_PLAY, LIVE, PAUSED, SCHEDULED
                 let status = 'upcoming';
@@ -1971,6 +2004,7 @@
 
                 return {
                     date: dateStr,
+                    time: timeStr,
                     group: groupLetter,
                     home: homeName,
                     away: awayName,
