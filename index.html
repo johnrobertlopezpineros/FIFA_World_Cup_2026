@@ -1626,6 +1626,20 @@
         }
 
         /* ===== FLOATING NAVIGATION BUTTON ===== */
+        @keyframes nav-btn-pulse {
+            0% {
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), 0 0 0 0 rgba(34, 211, 238, 0.5);
+                border-color: rgba(34, 211, 238, 0.6);
+            }
+            50% {
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), 0 0 16px 6px rgba(34, 211, 238, 0.3);
+                border-color: rgba(34, 211, 238, 1);
+            }
+            100% {
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), 0 0 0 0 rgba(34, 211, 238, 0.5);
+                border-color: rgba(34, 211, 238, 0.6);
+            }
+        }
         .nav-scroll-btn {
             position: fixed;
             bottom: 24px;
@@ -1645,13 +1659,15 @@
             align-items: center;
             gap: 8px;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: nav-btn-pulse 2s infinite ease-in-out;
         }
         .nav-scroll-btn:hover {
             transform: translateY(-3px) scale(1.05);
             background: linear-gradient(135deg, #22d3ee, #0ea5e9);
             color: var(--bg-primary);
-            box-shadow: 0 8px 30px rgba(34, 211, 238, 0.3);
+            box-shadow: 0 8px 30px rgba(34, 211, 238, 0.4);
             border-color: transparent;
+            animation: none;
         }
         .nav-scroll-btn svg {
             width: 16px;
