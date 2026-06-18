@@ -2032,8 +2032,8 @@
             { date: '2026-06-16', group: 'J', home: 'Argentina', away: 'Algeria', score: null, venue: 'Hard Rock Stadium, Miami', status: 'upcoming' },
             { date: '2026-06-16', group: 'J', home: 'Austria', away: 'Jordan', score: null, venue: "Levi's Stadium, San Francisco", status: 'upcoming' },
             // June 17
-            { date: '2026-06-17', group: 'K', home: 'Portugal', away: 'DR Congo', score: null, venue: 'Lincoln Financial Field, Filadelfia', status: 'upcoming' },
-            { date: '2026-06-17', group: 'K', home: 'Uzbekistan', away: 'Colombia', score: null, venue: 'NRG Stadium, Houston', status: 'upcoming' },
+            { date: '2026-06-17', group: 'K', home: 'Portugal', away: 'DR Congo', score: null, venue: 'NRG Stadium, Houston', status: 'upcoming' },
+            { date: '2026-06-17', group: 'K', home: 'Uzbekistan', away: 'Colombia', score: null, venue: 'Estadio Azteca, Ciudad de México', status: 'upcoming' },
             { date: '2026-06-17', group: 'L', home: 'England', away: 'Croatia', score: null, venue: 'AT&T Stadium, Dallas', status: 'upcoming' },
             { date: '2026-06-17', group: 'L', home: 'Ghana', away: 'Panama', score: null, venue: 'Estadio Azteca, Ciudad de México', status: 'upcoming' },
 
@@ -2064,8 +2064,8 @@
             // June 23
             { date: '2026-06-23', group: 'J', home: 'Algeria', away: 'Austria', score: null, venue: "Levi's Stadium, San Francisco", status: 'upcoming' },
             { date: '2026-06-23', group: 'J', home: 'Jordan', away: 'Argentina', score: null, venue: 'Hard Rock Stadium, Miami', status: 'upcoming' },
-            { date: '2026-06-23', group: 'K', home: 'DR Congo', away: 'Uzbekistan', score: null, venue: 'NRG Stadium, Houston', status: 'upcoming' },
-            { date: '2026-06-23', group: 'K', home: 'Colombia', away: 'Portugal', score: null, venue: 'Lincoln Financial Field, Filadelfia', status: 'upcoming' },
+            { date: '2026-06-23', group: 'K', home: 'Colombia', away: 'DR Congo', score: null, venue: 'Estadio Akron, Guadalajara', status: 'upcoming' },
+            { date: '2026-06-23', group: 'K', home: 'Portugal', away: 'Uzbekistan', score: null, venue: 'NRG Stadium, Houston', status: 'upcoming' },
 
             // ===== MATCHDAY 3 =====
             // June 24
@@ -2094,8 +2094,8 @@
             { date: '2026-06-27', group: 'I', home: 'Iraq', away: 'France', score: null, venue: 'MetLife Stadium, Nueva York', status: 'upcoming' },
             { date: '2026-06-27', group: 'J', home: 'Jordan', away: 'Algeria', score: null, venue: "Levi's Stadium, San Francisco", status: 'upcoming' },
             { date: '2026-06-27', group: 'J', home: 'Austria', away: 'Argentina', score: null, venue: 'Hard Rock Stadium, Miami', status: 'upcoming' },
-            { date: '2026-06-27', group: 'K', home: 'Colombia', away: 'DR Congo', score: null, venue: 'NRG Stadium, Houston', status: 'upcoming' },
-            { date: '2026-06-27', group: 'K', home: 'Uzbekistan', away: 'Portugal', score: null, venue: 'Lincoln Financial Field, Filadelfia', status: 'upcoming' },
+            { date: '2026-06-27', group: 'K', home: 'DR Congo', away: 'Uzbekistan', score: null, venue: 'Mercedes-Benz Stadium, Atlanta', status: 'upcoming' },
+            { date: '2026-06-27', group: 'K', home: 'Colombia', away: 'Portugal', score: null, venue: 'Hard Rock Stadium, Miami', status: 'upcoming' },
             { date: '2026-06-27', group: 'L', home: 'Panama', away: 'Croatia', score: null, venue: 'AT&T Stadium, Dallas', status: 'upcoming' },
             { date: '2026-06-27', group: 'L', home: 'Ghana', away: 'England', score: null, venue: 'Estadio Azteca, Ciudad de México', status: 'upcoming' },
         ];
@@ -2701,13 +2701,15 @@
                     }
                 }
 
-                // Fallback de estadio: si la API no trae el estadio, lo buscamos en los partidos locales predefinidos
+                // Fallback de estadio: si la API no trae el estadio, lo buscamos en los partidos locales predefinidos (soportando inversión de localía)
                 let venue = m.venue;
                 if (!venue || venue === 'Estadio del Mundial') {
-                    const localMatch = defaultMatches.find(dm => 
-                        (dm.home === homeName && dm.away === awayName) || 
-                        (normalizeTeamName(dm.home) === homeName && normalizeTeamName(dm.away) === awayName)
-                    );
+                    const localMatch = defaultMatches.find(dm => {
+                        const localHome = normalizeTeamName(dm.home);
+                        const localAway = normalizeTeamName(dm.away);
+                        return (localHome === homeName && localAway === awayName) || 
+                               (localHome === awayName && localAway === homeName);
+                    });
                     venue = localMatch ? localMatch.venue : 'Estadio del Mundial';
                 }
 
