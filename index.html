@@ -2151,6 +2151,27 @@
             return countryEmoji[countryName] || '🏳️';
         }
 
+        // Spanish translations for country display labels
+        const countryEs = {
+            'Mexico': 'México', 'South Africa': 'Sudáfrica', 'Korea Republic': 'Corea del Sur', 'Czechia': 'Chequia',
+            'Canada': 'Canadá', 'Bosnia and Herzegovina': 'Bosnia y Herzegovina', 'Qatar': 'Catar', 'Switzerland': 'Suiza',
+            'Brazil': 'Brasil', 'Morocco': 'Marruecos', 'Haiti': 'Haití', 'Scotland': 'Escocia',
+            'United States': 'Estados Unidos', 'Paraguay': 'Paraguay', 'Australia': 'Australia', 'Türkiye': 'Turquía',
+            'Germany': 'Alemania', 'Curaçao': 'Curazao', 'Ivory Coast': 'Costa de Marfil', 'Ecuador': 'Ecuador',
+            'Netherlands': 'Países Bajos', 'Japan': 'Japón', 'Sweden': 'Suecia', 'Tunisia': 'Túnez',
+            'Belgium': 'Bélgica', 'Egypt': 'Egipto', 'Iran': 'Irán', 'New Zealand': 'Nueva Zelanda',
+            'Spain': 'España', 'Cape Verde': 'Cabo Verde', 'Saudi Arabia': 'Arabia Saudita', 'Uruguay': 'Uruguay',
+            'France': 'Francia', 'Senegal': 'Senegal', 'Iraq': 'Irak', 'Norway': 'Noruega',
+            'Argentina': 'Argentina', 'Algeria': 'Argelia', 'Austria': 'Austria', 'Jordan': 'Jordania',
+            'Portugal': 'Portugal', 'DR Congo': 'Rep. Dem. del Congo', 'Uzbekistan': 'Uzbekistán', 'Colombia': 'Colombia',
+            'England': 'Inglaterra', 'Croatia': 'Croacia', 'Ghana': 'Ghana', 'Panama': 'Panamá'
+        };
+
+        function translateCountry(countryName) {
+            if (!countryName) return '';
+            return countryEs[countryName] || countryName;
+        }
+
         // Helper: get group for country
         function getGroupForCountry(countryName) {
             for (const [group, teams] of Object.entries(groups)) {
@@ -2348,7 +2369,7 @@
             const info = countryCodeMap[countryName];
 
             document.getElementById('tooltip-flag').textContent = getFlag(countryName);
-            document.getElementById('tooltip-country').textContent = countryName;
+            document.getElementById('tooltip-country').textContent = translateCountry(countryName);
             document.getElementById('tooltip-group').textContent = `Grupo ${group}`;
 
             const matchesContainer = document.getElementById('tooltip-matches');
@@ -2357,14 +2378,16 @@
             countryMatches.forEach(match => {
                 const isHome = match.home === countryName;
                 const opponent = isHome ? match.away : match.home;
+                const homeDisp = translateCountry(match.home);
+                const awayDisp = translateCountry(match.away);
 
                 matchesContainer.innerHTML += `
                 <div class="tooltip-match">
                     <div class="tooltip-match-teams">
                         <span class="flag-emoji">${getFlag(match.home)}</span>
-                        <span>${match.home === countryName ? '<strong>' + match.home + '</strong>' : match.home}</span>
+                        <span>${match.home === countryName ? '<strong>' + homeDisp + '</strong>' : homeDisp}</span>
                         <span class="tooltip-match-vs">vs</span>
-                        <span>${match.away === countryName ? '<strong>' + match.away + '</strong>' : match.away}</span>
+                        <span>${match.away === countryName ? '<strong>' + awayDisp + '</strong>' : awayDisp}</span>
                         <span class="flag-emoji">${getFlag(match.away)}</span>
                     </div>
                     <div class="tooltip-match-score ${match.score ? '' : 'pending'}">
@@ -2483,7 +2506,7 @@
                 <div class="match-card-teams">
                     <div class="match-team home">
                         <span class="flag-emoji">${getFlag(match.home)}</span>
-                        <span class="match-team-name">${match.home}</span>
+                        <span class="match-team-name">${translateCountry(match.home)}</span>
                     </div>
                     <div class="match-score-container">
                         <div class="match-score ${match.score ? '' : 'pending'}">
@@ -2492,7 +2515,7 @@
                     </div>
                     <div class="match-team away">
                         <span class="flag-emoji">${getFlag(match.away)}</span>
-                        <span class="match-team-name">${match.away}</span>
+                        <span class="match-team-name">${translateCountry(match.away)}</span>
                     </div>
                 </div>
                 <div class="match-venue">${match.venue}</div>
@@ -2960,15 +2983,15 @@
                         </div>
                         <div class="ticker-main">
                             <div class="ticker-team home">
-                                <span class="ticker-team-name">${match.home}</span>
-                                <img src="${getFlagUrl(match.home)}" class="ticker-flag" alt="${match.home}" />
+                                <span class="ticker-team-name">${translateCountry(match.home)}</span>
+                                <img src="${getFlagUrl(match.home)}" class="ticker-flag" alt="${translateCountry(match.home)}" />
                             </div>
                             <div class="ticker-score-wrap">
                                 <div class="ticker-score">${match.score || '0 - 0'}</div>
                             </div>
                             <div class="ticker-team away">
-                                <img src="${getFlagUrl(match.away)}" class="ticker-flag" alt="${match.away}" />
-                                <span class="ticker-team-name">${match.away}</span>
+                                <img src="${getFlagUrl(match.away)}" class="ticker-flag" alt="${translateCountry(match.away)}" />
+                                <span class="ticker-team-name">${translateCountry(match.away)}</span>
                             </div>
                         </div>
                         <div class="ticker-meta">
@@ -3006,15 +3029,15 @@
                             </div>
                             <div class="ticker-main">
                                 <div class="ticker-team home">
-                                    <span class="ticker-team-name">${nextMatch.home}</span>
-                                    <img src="${getFlagUrl(nextMatch.home)}" class="ticker-flag" alt="${nextMatch.home}" />
+                                    <span class="ticker-team-name">${translateCountry(nextMatch.home)}</span>
+                                    <img src="${getFlagUrl(nextMatch.home)}" class="ticker-flag" alt="${translateCountry(nextMatch.home)}" />
                                 </div>
                                 <div class="ticker-score-wrap">
                                     <div class="ticker-vs">VS</div>
                                 </div>
                                 <div class="ticker-team away">
-                                    <img src="${getFlagUrl(nextMatch.away)}" class="ticker-flag" alt="${nextMatch.away}" />
-                                    <span class="ticker-team-name">${nextMatch.away}</span>
+                                    <img src="${getFlagUrl(nextMatch.away)}" class="ticker-flag" alt="${translateCountry(nextMatch.away)}" />
+                                    <span class="ticker-team-name">${translateCountry(nextMatch.away)}</span>
                                 </div>
                             </div>
                             <div class="ticker-meta">
@@ -3160,7 +3183,11 @@
             for (const [groupLetter, teamStats] of Object.entries(groupStandings)) {
                 if (filterGroup !== 'all' && filterGroup !== groupLetter) continue;
                 
-                const hasFilteredTeam = teamStats.some(ts => ts.team.toLowerCase().includes(normalizedFilterTeam));
+                const hasFilteredTeam = teamStats.some(ts => {
+                    const nameEs = translateCountry(ts.team).toLowerCase();
+                    const nameEn = ts.team.toLowerCase();
+                    return nameEn.includes(normalizedFilterTeam) || nameEs.includes(normalizedFilterTeam);
+                });
                 if (normalizedFilterTeam && !hasFilteredTeam) continue;
 
                 const card = document.createElement('div');
@@ -3187,7 +3214,10 @@
 
                 teamStats.forEach((stats, idx) => {
                     const pos = idx + 1;
-                    const isHighlighted = normalizedFilterTeam && stats.team.toLowerCase().includes(normalizedFilterTeam);
+                    const teamNameEs = translateCountry(stats.team).toLowerCase();
+                    const teamNameEn = stats.team.toLowerCase();
+                    const isHighlighted = normalizedFilterTeam && 
+                                           (teamNameEn.includes(normalizedFilterTeam) || teamNameEs.includes(normalizedFilterTeam));
                     const rankClass = pos === 1 || pos === 2 ? 'rank-1' : pos === 3 ? 'rank-3' : 'rank-4';
                     
                     tableHtml += `
@@ -3197,7 +3227,7 @@
                             </td>
                             <td class="team-cell">
                                 <span class="flag-emoji">${getFlag(stats.team)}</span>
-                                <span>${stats.team}</span>
+                                <span>${translateCountry(stats.team)}</span>
                             </td>
                             <td class="num-cell">${stats.played}</td>
                             <td class="num-cell" style="color: ${stats.gd > 0 ? '#34d399' : stats.gd < 0 ? '#f87171' : 'var(--text-muted)'}">
@@ -3301,7 +3331,7 @@
                         <div class="bracket-team-row ${homeWinner ? 'winner' : ''}">
                             <div class="bracket-team-info">
                                 ${homeFlag}
-                                <span class="bracket-team-name">${homeName}</span>
+                                <span class="bracket-team-name">${translateCountry(homeName)}</span>
                             </div>
                             <span class="bracket-team-score">
                                 ${scoreDetails.home !== null ? scoreDetails.home : '-'}
@@ -3311,7 +3341,7 @@
                         <div class="bracket-team-row ${awayWinner ? 'winner' : ''}">
                             <div class="bracket-team-info">
                                 ${awayFlag}
-                                <span class="bracket-team-name">${awayName}</span>
+                                <span class="bracket-team-name">${translateCountry(awayName)}</span>
                             </div>
                             <span class="bracket-team-score">
                                 ${scoreDetails.away !== null ? scoreDetails.away : '-'}
