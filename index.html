@@ -302,6 +302,106 @@
             stroke-width: 2;
         }
 
+        .country.live-playing {
+            animation: country-pulse-live 2s infinite ease-in-out;
+            cursor: pointer;
+        }
+
+        .country.live-playing:hover {
+            animation-play-state: paused;
+            filter: brightness(1.5) saturate(1.3) drop-shadow(0 0 12px rgba(248, 113, 113, 1));
+            stroke: #ff3333;
+            stroke-width: 2.5px;
+        }
+
+        .country.upcoming-playing {
+            animation: country-pulse-upcoming 2s infinite ease-in-out;
+            cursor: pointer;
+        }
+
+        .country.upcoming-playing:hover {
+            animation-play-state: paused;
+            filter: brightness(1.4) saturate(1.2) drop-shadow(0 0 12px rgba(34, 211, 238, 1));
+            stroke: #00f3ff;
+            stroke-width: 2.5px;
+        }
+
+        /* Pulsing neon highlights for live and upcoming countries */
+        @keyframes country-pulse-live {
+            0% {
+                stroke: var(--accent-red);
+                stroke-width: 1.2px;
+                filter: brightness(1.2) saturate(1.1) drop-shadow(0 0 3px rgba(248, 113, 113, 0.5));
+            }
+            50% {
+                stroke: #ff4d4d;
+                stroke-width: 2.2px;
+                filter: brightness(1.4) saturate(1.3) drop-shadow(0 0 8px rgba(248, 113, 113, 0.9));
+            }
+            100% {
+                stroke: var(--accent-red);
+                stroke-width: 1.2px;
+                filter: brightness(1.2) saturate(1.1) drop-shadow(0 0 3px rgba(248, 113, 113, 0.5));
+            }
+        }
+
+        @keyframes country-pulse-upcoming {
+            0% {
+                stroke: var(--accent-cyan);
+                stroke-width: 1.0px;
+                filter: brightness(1.1) saturate(1.05) drop-shadow(0 0 3px rgba(34, 211, 238, 0.4));
+            }
+            50% {
+                stroke: #00f3ff;
+                stroke-width: 2.0px;
+                filter: brightness(1.3) saturate(1.2) drop-shadow(0 0 8px rgba(34, 211, 238, 0.8));
+            }
+            100% {
+                stroke: var(--accent-cyan);
+                stroke-width: 1.0px;
+                filter: brightness(1.1) saturate(1.05) drop-shadow(0 0 3px rgba(34, 211, 238, 0.4));
+            }
+        }
+
+        /* Map Legend Pulsing Indicators */
+        @keyframes legend-live-pulse {
+            0% {
+                box-shadow: 0 0 2px rgba(248, 113, 113, 0.4);
+                border-color: var(--accent-red);
+            }
+            50% {
+                box-shadow: 0 0 8px rgba(248, 113, 113, 0.8);
+                border-color: #ef4444;
+            }
+            100% {
+                box-shadow: 0 0 2px rgba(248, 113, 113, 0.4);
+                border-color: var(--accent-red);
+            }
+        }
+        
+        @keyframes legend-upcoming-pulse {
+            0% {
+                box-shadow: 0 0 2px rgba(34, 211, 238, 0.3);
+                border-color: var(--accent-cyan);
+            }
+            50% {
+                box-shadow: 0 0 8px rgba(34, 211, 238, 0.7);
+                border-color: #06b6d4;
+            }
+            100% {
+                box-shadow: 0 0 2px rgba(34, 211, 238, 0.3);
+                border-color: var(--accent-cyan);
+            }
+        }
+
+        .legend-color.legend-live-playing {
+            animation: legend-live-pulse 2s infinite ease-in-out;
+        }
+
+        .legend-color.legend-upcoming-playing {
+            animation: legend-upcoming-pulse 2s infinite ease-in-out;
+        }
+
         /* Map legend */
         .map-legend {
             position: absolute;
@@ -1774,6 +1874,16 @@
                 </div>
             </div>
             <div class="map-legend">
+                <div class="legend-item" id="legend-live-item" style="display: none;">
+                    <div class="legend-color legend-live-playing"
+                        style="background: rgba(248, 113, 113, 0.25); border: 1.5px solid var(--accent-red);"></div>
+                    <span>En juego (En Vivo)</span>
+                </div>
+                <div class="legend-item" id="legend-upcoming-item" style="display: none;">
+                    <div class="legend-color legend-upcoming-playing"
+                        style="background: rgba(34, 211, 238, 0.25); border: 1.5px solid var(--accent-cyan);"></div>
+                    <span>Próximo partido</span>
+                </div>
                 <div class="legend-item">
                     <div class="legend-color"
                         style="background: linear-gradient(135deg, #d4a853, #b8942e); border: 1px solid #d4a853;"></div>
@@ -2268,6 +2378,43 @@
 
                 const mapGroup = svg.append('g');
 
+                // Determine live and upcoming playing teams
+                const liveTeams = new Set();
+                const upcomingTeams = new Set();
+                const liveMatches = matches.filter(m => m.status === 'live');
+                if (liveMatches.length > 0) {
+                    liveMatches.forEach(m => {
+                        liveTeams.add(m.home);
+                        liveTeams.add(m.away);
+                    });
+                } else {
+                    const upcomingMatches = matches.filter(m => m.status === 'upcoming');
+                    if (upcomingMatches.length > 0) {
+                        upcomingMatches.sort((a, b) => {
+                            if (a.utcDate && b.utcDate) return new Date(a.utcDate) - new Date(b.utcDate);
+                            if (a.date !== b.date) return a.date.localeCompare(b.date);
+                            if (a.time && b.time) return a.time.localeCompare(b.time);
+                            return 0;
+                        });
+                        const nextMatch = upcomingMatches[0];
+                        upcomingTeams.add(nextMatch.home);
+                        upcomingTeams.add(nextMatch.away);
+                    }
+                }
+
+                // Toggle legend items based on what is active
+                const liveLegend = document.getElementById('legend-live-item');
+                const upcomingLegend = document.getElementById('legend-upcoming-item');
+                if (liveLegend && upcomingLegend) {
+                    if (liveMatches.length > 0) {
+                        liveLegend.style.display = 'flex';
+                        upcomingLegend.style.display = 'none';
+                    } else {
+                        liveLegend.style.display = 'none';
+                        upcomingLegend.style.display = 'flex';
+                    }
+                }
+
                 // Draw countries
                 mapGroup.selectAll('.country')
                     .data(countries)
@@ -2276,8 +2423,19 @@
                     .attr('class', d => {
                         const countryName = topoIdToCountry[d.id];
                         if (!countryName) return 'country';
-                        if (hostCountries.includes(countryName)) return 'country participant host';
-                        return 'country participant';
+                        let classes = 'country';
+                        if (countryCodeMap[countryName]) {
+                            classes += ' participant';
+                        }
+                        if (hostCountries.includes(countryName)) {
+                            classes += ' host';
+                        }
+                        if (liveTeams.has(countryName)) {
+                            classes += ' live-playing';
+                        } else if (upcomingTeams.has(countryName)) {
+                            classes += ' upcoming-playing';
+                        }
+                        return classes;
                     })
                     .attr('d', path)
                     .attr('fill', d => {
@@ -2299,6 +2457,9 @@
                     .on('mouseleave', function () {
                         hideTooltip();
                     });
+
+                // Raise live and upcoming countries so their pulsing borders are fully visible on top of other countries
+                mapGroup.selectAll('.country.live-playing, .country.upcoming-playing').raise();
 
                 // Draw borders
                 mapGroup.append('path')
