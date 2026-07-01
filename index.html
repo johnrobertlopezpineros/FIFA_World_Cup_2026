@@ -608,6 +608,90 @@
             font-weight: 600;
         }
 
+        /* Toggle Switch styling */
+        .calendar-controls-wrap {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 10px;
+            margin-bottom: 15px;
+        }
+
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            user-select: none;
+            background: rgba(15, 20, 40, 0.6);
+            padding: 8px 16px;
+            border-radius: 50px;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .toggle-container:hover {
+            border-color: var(--accent-gold-dim);
+            background: rgba(15, 20, 40, 0.8);
+            box-shadow: 0 0 12px rgba(212, 168, 83, 0.1);
+        }
+
+        .toggle-input {
+            display: none;
+        }
+
+        .toggle-track {
+            width: 36px;
+            height: 20px;
+            background: #1e293b;
+            border-radius: 50px;
+            position: relative;
+            transition: background-color 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .toggle-thumb {
+            width: 14px;
+            height: 14px;
+            background: var(--text-secondary);
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+        }
+
+        .toggle-input:checked + .toggle-track {
+            background: var(--gradient-gold);
+        }
+
+        .toggle-input:checked + .toggle-track .toggle-thumb {
+            transform: translateX(16px);
+            background: var(--bg-primary);
+        }
+
+        .toggle-text {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .last-played-badge {
+            background: rgba(34, 211, 238, 0.12);
+            border: 1px solid rgba(34, 211, 238, 0.4);
+            color: var(--accent-cyan);
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+            margin-left: 12px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            animation: fadeIn 0.5s ease-out;
+            box-shadow: 0 0 8px rgba(34, 211, 238, 0.1);
+        }
+
         /* ===== CALENDAR ===== */
         .calendar-section {
             max-width: 1200px;
@@ -1958,6 +2042,16 @@
         <p>Fase de grupos — 11 al 27 de junio, 2026</p>
     </div>
 
+    <div class="calendar-controls-wrap">
+        <label class="toggle-container" for="hide-past-matches-toggle">
+            <input type="checkbox" id="hide-past-matches-toggle" class="toggle-input" checked />
+            <div class="toggle-track">
+                <div class="toggle-thumb"></div>
+            </div>
+            <span class="toggle-text">Ocultar partidos pasados (mostrar solo fecha actual jugada y futuros)</span>
+        </label>
+    </div>
+
     <div class="filter-bar" id="filter-bar">
         <button class="filter-btn active" data-group="all">Todos</button>
     </div>
@@ -2616,9 +2710,23 @@
             const container = document.getElementById('calendar-container');
             container.innerHTML = '';
 
-            const filtered = filterGroup === 'all'
+            let filtered = filterGroup === 'all'
                 ? matches
                 : matches.filter(m => m.group === filterGroup);
+
+            // Find the latest date of a played match globally
+            const playedMatches = matches.filter(m => m.status === 'played');
+            let lastPlayedDate = null;
+            if (playedMatches.length > 0) {
+                const playedDates = [...new Set(playedMatches.map(m => m.date))].sort();
+                lastPlayedDate = playedDates[playedDates.length - 1];
+            }
+
+            // Hide past matches filter
+            const hidePastMatches = document.getElementById('hide-past-matches-toggle')?.checked ?? true;
+            if (hidePastMatches && lastPlayedDate) {
+                filtered = filtered.filter(m => m.date >= lastPlayedDate);
+            }
 
             // Group by date
             const byDate = {};
@@ -2632,14 +2740,24 @@
             sortedDates.forEach((date, idx) => {
                 const dayMatches = byDate[date];
                 const dayEl = document.createElement('div');
-                dayEl.className = 'calendar-day';
+                
+                const isLastPlayed = lastPlayedDate && date === lastPlayedDate;
+                dayEl.className = 'calendar-day' + (isLastPlayed ? ' last-played-day' : '');
                 dayEl.style.animationDelay = `${idx * 0.05}s`;
 
                 const matchdayNum = date <= '2026-06-17' ? '1' : date <= '2026-06-23' ? '2' : '3';
+                
+                // Add badge or text if last played
+                const lastPlayedIndicator = isLastPlayed 
+                    ? `<span class="last-played-badge">Última Jornada Jugada</span>` 
+                    : '';
 
                 dayEl.innerHTML = `
                 <div class="calendar-day-header">
-                    <div class="calendar-day-date">${formatDateLong(date)}</div>
+                    <div class="calendar-day-date-wrap" style="display: flex; align-items: center;">
+                        <div class="calendar-day-date">${formatDateLong(date)}</div>
+                        ${lastPlayedIndicator}
+                    </div>
                     <div class="calendar-day-badge">Jornada ${matchdayNum}</div>
                 </div>
                 <div class="calendar-matches">
@@ -2901,7 +3019,11 @@
                 // Stage
                 let stage = 'GROUP_STAGE';
                 if (m.stage) {
-                    stage = m.stage;
+                    if (m.stage === 'LAST_16') {
+                        stage = 'ROUND_OF_16';
+                    } else {
+                        stage = m.stage;
+                    }
                 }
 
                 return {
@@ -3582,7 +3704,12 @@
                     <span>Ver Calendario</span>
                 `;
                 btn.onclick = () => {
-                    calendarioSec.scrollIntoView({ behavior: 'smooth' });
+                    const lastPlayedEl = document.querySelector('.calendar-day.last-played-day') || document.getElementById('calendar-container')?.firstElementChild;
+                    if (lastPlayedEl) {
+                        lastPlayedEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    } else {
+                        calendarioSec.scrollIntoView({ behavior: 'smooth' });
+                    }
                 };
             } else {
                 // Bottom section: point back to Top (Map)
@@ -3631,6 +3758,16 @@
             initTabs();
             renderStandings();
             renderBracket();
+            
+            // Listen for changes on the hide-past-matches toggle
+            const toggleInput = document.getElementById('hide-past-matches-toggle');
+            if (toggleInput) {
+                toggleInput.addEventListener('change', () => {
+                    const activeBtn = document.querySelector('.filter-btn.active');
+                    const activeGroup = activeBtn ? activeBtn.dataset.group : 'all';
+                    renderCalendar(activeGroup);
+                });
+            }
             
             // Initialize Scroll Navigation Button
             updateNavScrollBtn();
